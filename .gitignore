@@ -1,0 +1,32 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/jspm_packages
+
+# tooling
+/bower_components
+
+# build results
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider files
+.idea/
+
+# secrets
+appsettings.Development.json
+
+# User Secrets
+secrets.json
+
+# others
+*.DS_Store
+*.swp
