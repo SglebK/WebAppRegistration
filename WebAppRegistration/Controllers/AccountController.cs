@@ -1,5 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using WebAppRegistration.Data;
 using WebAppRegistration.Models;
 
@@ -56,6 +63,51 @@ namespace WebAppRegistration.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (string.IsNullOrEmpty(model.Login) || string.IsNullOrEmpty(model.Password))
+            {
+                return BadRequest("Логін та пароль не можуть бути порожніми.");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == model.Login);
+
+            if (user == null)
+            {
+                return BadRequest("Невірний логін або пароль.");
+            }
+
+            var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, model.Password);
+
+            if (passwordVerificationResult == PasswordVerificationResult.Failed)
+            {
+                return BadRequest("Невірний логін або пароль.");
+            }
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Login),
+                new Claim("FullName", user.Name),
+                new Claim(ClaimTypes.DateOfBirth, user.Birthday.ToString("o"))
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Success()
