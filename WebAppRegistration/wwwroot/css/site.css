@@ -93,3 +93,10 @@ label {
     font-size: 1.2rem;
     font-weight: bold;
 }
+
+.form-control:read-only,
+.form-control:disabled {
+    background-color: #343a40;
+    color: #ced4da;
+    opacity: 0.8;
+}

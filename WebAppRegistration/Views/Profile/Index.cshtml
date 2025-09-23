@@ -1,0 +1,115 @@
+﻿@model WebAppRegistration.Models.User
+
+@{
+    ViewData["Title"] = "Персональний кабінет";
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div id="updateError" class="alert alert-danger" style="display:none;"></div>
+
+        <form id="profileForm">
+            <div class="mb-3">
+                <label class="form-label">Ім'я</label>
+                <input type="text" asp-for="Name" class="form-control" readonly />
+                <span data-valmsg-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" asp-for="Email" class="form-control" readonly />
+                <span data-valmsg-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Логін</label>
+                <input type="text" asp-for="Login" class="form-control" readonly disabled />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Дата народження</label>
+                <input type="text" value="@Model.Birthday.ToShortDateString()" class="form-control" readonly disabled />
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" id="editButton" class="btn btn-primary">Редагувати</button>
+                <button type="button" id="deleteButton" class="btn btn-danger">Видалити акаунт</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            let isEditMode = false;
+            let originalData = {};
+
+            function toggleEditMode(enable) {
+                isEditMode = enable;
+                const inputs = $('#profileForm input[name="Name"], #profileForm input[name="Email"]');
+                const editButton = $('#editButton');
+
+                if (enable) {
+                    originalData.Name = inputs.filter('[name="Name"]').val();
+                    originalData.Email = inputs.filter('[name="Email"]').val();
+
+                    inputs.prop('readonly', false);
+                    editButton.text('Зберегти').removeClass('btn-primary').addClass('btn-success');
+                } else {
+                    inputs.prop('readonly', true);
+                    editButton.text('Редагувати').removeClass('btn-success').addClass('btn-primary');
+                    $('#updateError').hide();
+                }
+            }
+
+            $('#editButton').on('click', function () {
+                if (!isEditMode) {
+                    toggleEditMode(true);
+                } else {
+                    $('#profileForm').trigger('submit');
+                }
+            });
+
+            $('#profileForm').on('submit', function (e) {
+                e.preventDefault();
+                if (!isEditMode) return;
+
+                const updatedData = {
+                    Name: $('input[name="Name"]').val(),
+                    Email: $('input[name="Email"]').val()
+                };
+
+                $.ajax({
+                    url: '@Url.Action("Update", "Profile")',
+                    method: 'POST',
+                    data: updatedData,
+                    success: function (response) {
+                        toggleEditMode(false);
+                        $('.user-avatar').attr('title', updatedData.Name);
+                    },
+                    error: function (xhr) {
+                        $('#updateError').text(xhr.responseText).show();
+                        $('input[name="Name"]').val(originalData.Name);
+                        $('input[name="Email"]').val(originalData.Email);
+                        toggleEditMode(false);
+                    }
+                });
+            });
+
+            $('#deleteButton').on('click', function() {
+                if(confirm('Ви впевнені, що хочете видалити свій акаунт? Цю дію неможливо скасувати.')) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Profile")',
+                        method: 'POST',
+                        success: function() {
+                            window.location.href = '/';
+                        },
+                        error: function(xhr) {
+                            alert('Не вдалося видалити акаунт: ' + xhr.responseText);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

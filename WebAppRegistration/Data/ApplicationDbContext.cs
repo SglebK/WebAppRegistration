@@ -10,7 +10,12 @@ namespace WebAppRegistration.Data
         }
 
         public DbSet<User> Users { get; set; }
-        
         public DbSet<RequestLog> RequestLogs { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>().HasQueryFilter(u => u.DateDeleted == null);
+        }
     }
 }

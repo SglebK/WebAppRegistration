@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAppRegistration.Models
 {
@@ -21,5 +22,7 @@ namespace WebAppRegistration.Models
 
         [Required]
         public DateTime Birthday { get; set; }
+
+        public DateTime? DateDeleted { get; set; }
     }
 }
