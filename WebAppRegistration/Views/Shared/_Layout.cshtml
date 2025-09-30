@@ -47,6 +47,10 @@
                                 </span>
                             }
 
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Group" asp-action="Index">Групи</a>
+                            </li>
+
                             <a asp-controller="Profile" asp-action="Index" class="user-avatar me-2 text-decoration-none" title="@User.Claims.FirstOrDefault(c => c.Type == "FullName")?.Value">
                                 @User.Identity.Name[0].ToString().ToUpper()
                             </a>
