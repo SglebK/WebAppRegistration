@@ -1,11 +1,37 @@
-﻿@{
+﻿@model List<WebAppRegistration.Models.Group>
+
+@{
     ViewData["Title"] = "Головна сторінка";
 }
 
 <div class="text-center">
     <h1 class="display-4">Ласкаво просимо!</h1>
-    <p class="lead">Це демонстраційний проект для реєстрації користувачів на ASP.NET Core.</p>
-    <hr class="my-4">
-    <p>Щоб продовжити, будь ласка, створіть новий обліковий запис.</p>
-    <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Register" role="button">Перейти до реєстрації</a>
+    <p class="lead">Каталог груп товарів</p>
+</div>
+
+<div class="row mt-4">
+    @if (Model.Any())
+    {
+        @foreach (var group in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 bg-dark text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">@group.Name</h5>
+                        <p class="card-text">@group.Description</p>
+                    </div>
+                    @if (group.Subgroups.Any())
+                    {
+                        <div class="card-footer">
+                            <small class="text-muted">Кількість підгруп: @group.Subgroups.Count</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-center">Наразі немає жодної групи.</p>
+    }
 </div>

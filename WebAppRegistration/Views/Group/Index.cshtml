@@ -22,6 +22,14 @@
                 <input asp-for="Description" class="form-control" placeholder="Опис" />
                 <label asp-for="Description" class="text-dark"></label>
             </div>
+
+            <div class="form-floating mb-3">
+                <select asp-for="ParentId" class="form-select" asp-items="@(new SelectList(ViewBag.Groups, "Id", "Name"))">
+                    <option value="0">Без батьківської групи (головна)</option>
+                </select>
+                <label asp-for="ParentId" class="text-dark">Батьківська група</label>
+            </div>
+
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Створити</button>
             </div>
@@ -46,6 +54,13 @@
                     success: function (response) {
                         $('#groupSuccess').text(response).show();
                         form[0].reset();
+
+                        setTimeout(function() {
+                           $.get(location.href, function(data) {
+                               var newOptions = $(data).find('#ParentId').html();
+                               $('#ParentId').html(newOptions);
+                           });
+                        }, 500);
                     },
                     error: function (xhr) {
                         $('#groupError').text(xhr.responseText).show();

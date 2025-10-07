@@ -1,0 +1,57 @@
+﻿@model WebAppRegistration.Models.Product
+
+@{
+    ViewData["Title"] = "Панель адміністратора";
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-6">
+        <h4 class="mb-3">Додати новий товар</h4>
+
+        <div id="productError" class="alert alert-danger" style="display:none;"></div>
+        <div id="productSuccess" class="alert alert-success" style="display:none;"></div>
+
+        <form id="createProductForm">
+            <div class="form-floating mb-3">
+                <input asp-for="Name" class="form-control" placeholder="Назва товару" />
+                <label asp-for="Name" class="text-dark"></label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Price" class="form-control" placeholder="Ціна" />
+                <label asp-for="Price" class="text-dark"></label>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Додати товар</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('#createProductForm').on('submit', function (e) {
+                e.preventDefault();
+                var form = $(this);
+
+                $('#productError').hide();
+                $('#productSuccess').hide();
+
+                $.ajax({
+                    url: '@Url.Action("CreateProduct", "Admin")',
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function (response) {
+                        $('#productSuccess').text(response).show();
+                        form[0].reset();
+                    },
+                    error: function (xhr) {
+                        $('#productError').text(xhr.responseText).show();
+                    }
+                });
+            });
+        });
+    </script>
+}

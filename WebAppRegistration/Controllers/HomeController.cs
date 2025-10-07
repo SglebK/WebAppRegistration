@@ -1,21 +1,30 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using WebAppRegistration.Data;
 using WebAppRegistration.Models;
 
 namespace WebAppRegistration.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var topLevelGroups = await _context.Groups
+                .Include(g => g.Subgroups)
+                .Where(g => g.ParentId == null)
+                .ToListAsync();
+
+            return View(topLevelGroups);
         }
 
         public IActionResult Privacy()

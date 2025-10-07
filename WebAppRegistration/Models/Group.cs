@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebAppRegistration.Models
 {
@@ -13,5 +15,12 @@ namespace WebAppRegistration.Models
 
         [StringLength(500, ErrorMessage = "Опис не може перевищувати 500 символів.")]
         public string Description { get; set; }
+
+        public int? ParentId { get; set; }
+
+        [ForeignKey("ParentId")]
+        public Group Parent { get; set; }
+
+        public ICollection<Group> Subgroups { get; set; }
     }
 }
