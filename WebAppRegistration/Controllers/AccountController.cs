@@ -89,6 +89,7 @@ namespace WebAppRegistration.Controllers
 
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Login),
                 new Claim("FullName", user.Name),
                 new Claim(ClaimTypes.DateOfBirth, user.Birthday.ToString("o"))

@@ -14,13 +14,13 @@ namespace WebAppRegistration.Models
         public string Name { get; set; }
 
         [StringLength(500, ErrorMessage = "Опис не може перевищувати 500 символів.")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public int? ParentId { get; set; }
 
         [ForeignKey("ParentId")]
-        public Group Parent { get; set; }
+        public Group? Parent { get; set; }
 
-        public ICollection<Group> Subgroups { get; set; }
+        public ICollection<Group>? Subgroups { get; set; }
     }
 }

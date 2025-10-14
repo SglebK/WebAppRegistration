@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace WebAppRegistration.Models
 {
@@ -24,5 +25,7 @@ namespace WebAppRegistration.Models
         public DateTime Birthday { get; set; }
 
         public DateTime? DateDeleted { get; set; }
+
+        public ICollection<CartItem> CartItems { get; set; }
     }
 }

@@ -16,5 +16,11 @@ namespace WebAppRegistration.Models
         [Range(0.01, 1000000.00, ErrorMessage = "Ціна повинна бути більшою за нуль.")]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Будь ласка, оберіть групу.")]
+        public int GroupId { get; set; }
+
+        [ForeignKey("GroupId")]
+        public Group? Group { get; set; }
     }
 }

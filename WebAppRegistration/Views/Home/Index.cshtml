@@ -15,18 +15,20 @@
         @foreach (var group in Model)
         {
             <div class="col-md-4 mb-4">
-                <div class="card h-100 bg-dark text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">@group.Name</h5>
-                        <p class="card-text">@group.Description</p>
-                    </div>
-                    @if (group.Subgroups.Any())
-                    {
-                        <div class="card-footer">
-                            <small class="text-muted">Кількість підгруп: @group.Subgroups.Count</small>
+                <a asp-controller="Product" asp-action="Index" asp-route-groupId="@group.Id" class="text-decoration-none">
+                    <div class="card h-100 bg-dark text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">@group.Name</h5>
+                            <p class="card-text">@group.Description</p>
                         </div>
-                    }
-                </div>
+                        @if (group.Subgroups.Any())
+                        {
+                            <div class="card-footer">
+                                <small class="text-muted">Кількість підгруп: @group.Subgroups.Count</small>
+                            </div>
+                        }
+                    </div>
+                </a>
             </div>
         }
     }

@@ -99,5 +99,34 @@ namespace WebAppRegistration.Controllers
 
             return Ok();
         }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await _context.Products.Include(p => p.Group).FirstOrDefaultAsync(p => p.Id == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var sameGroupRecs = await _context.Products
+                .Where(p => p.GroupId == product.GroupId && p.Id != product.Id)
+                .OrderBy(r => Guid.NewGuid())
+                .Take(3)
+                .ToListAsync();
+
+            var otherGroupRecs = await _context.Products
+                .Where(p => p.GroupId != product.GroupId)
+                .OrderBy(r => Guid.NewGuid())
+                .Take(3)
+                .ToListAsync();
+
+            var viewModel = new ProductDetailViewModel
+            {
+                Product = product,
+                RecommendedProducts = sameGroupRecs.Concat(otherGroupRecs).ToList()
+            };
+
+            return View(viewModel);
+        }
     }
 }

@@ -13,11 +13,13 @@ namespace WebAppRegistration.Data
         public DbSet<RequestLog> RequestLogs { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<User>().HasQueryFilter(u => u.DateDeleted == null);
+            modelBuilder.Entity<CartItem>().HasQueryFilter(ci => ci.User.DateDeleted == null);
         }
     }
 }

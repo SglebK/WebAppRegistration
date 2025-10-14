@@ -1,0 +1,31 @@
+﻿@model List<WebAppRegistration.Models.Product>
+
+@{
+    ViewData["Title"] = ViewBag.GroupName;
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+
+<div class="row mt-4">
+    @if (Model.Any())
+    {
+        @foreach (var product in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 bg-dark text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@product.Price.ToString("C")</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="btn btn-primary w-100">Детальніше</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-center">У цій групі ще немає товарів.</p>
+    }
+</div>

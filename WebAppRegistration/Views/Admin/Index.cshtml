@@ -22,6 +22,14 @@
                 <input asp-for="Price" class="form-control" placeholder="Ціна" />
                 <label asp-for="Price" class="text-dark"></label>
             </div>
+
+            <div class="form-floating mb-3">
+                <select asp-for="GroupId" class="form-select" asp-items="@(new SelectList(ViewBag.Groups, "Id", "Name"))">
+                    <option value="">Оберіть групу</option>
+                </select>
+                <label asp-for="GroupId" class="text-dark">Група товару</label>
+            </div>
+
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Додати товар</button>
             </div>

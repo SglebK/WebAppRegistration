@@ -29,7 +29,7 @@
                         </li>
                     </ul>
 
-                    <div class="navbar-nav">
+                    <div class="navbar-nav d-flex align-items-center">
                         @if (User.Identity.IsAuthenticated)
                         {
                             var birthdayClaim = User.FindFirst(ClaimTypes.DateOfBirth)?.Value;
@@ -47,13 +47,14 @@
                                 </span>
                             }
 
+                            <!-- НОВІ ПОСИЛАННЯ -->
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Group" asp-action="Index">Групи</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Admin" asp-action="Index">Адмінка</a>
                             </li>
+                            <!-- /НОВІ ПОСИЛАННЯ -->
 
                             <a asp-controller="Profile" asp-action="Index" class="user-avatar me-2 text-decoration-none" title="@User.Claims.FirstOrDefault(c => c.Type == "FullName")?.Value">
                                 @User.Identity.Name[0].ToString().ToUpper()

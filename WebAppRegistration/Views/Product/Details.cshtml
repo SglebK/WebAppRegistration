@@ -1,0 +1,70 @@
+﻿@model WebAppRegistration.Models.ProductDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Product.Name;
+}
+
+<div id="cartStatus" class="alert" style="display:none; position: fixed; top: 80px; right: 20px; z-index: 1050;"></div>
+
+<div class="row">
+    <div class="col-md-8">
+        <h1>@Model.Product.Name</h1>
+        <h3 class="text-muted">@Model.Product.Price.ToString("C")</h3>
+        <p>Група: @Model.Product.Group.Name</p>
+        <button id="addToCartBtn" class="btn btn-success btn-lg mt-3" data-product-id="@Model.Product.Id">Додати до кошику</button>
+    </div>
+</div>
+
+<hr class="my-5" />
+
+<h4>Вас також може зацікавити</h4>
+<div class="row mt-4">
+    @foreach (var rec in Model.RecommendedProducts)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">@rec.Name</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@rec.Price.ToString("C")</h6>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Product" asp-action="Details" asp-route-id="@rec.Id" class="btn btn-primary w-100">Детальніше</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+@section Scripts {
+    <script>
+        $(function() {
+            $('#addToCartBtn').on('click', function() {
+                var statusDiv = $('#cartStatus');
+
+                if (!@User.Identity.IsAuthenticated.ToString().ToLower()) {
+                    statusDiv.text('Для замовлення необхідно увійти в систему').removeClass('alert-success alert-danger').addClass('alert-warning').fadeIn().delay(3000).fadeOut();
+                    return;
+                }
+
+                var productId = $(this).data('product-id');
+
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "Cart")',
+                    method: 'POST',
+                    data: { productId: productId },
+                    success: function(response) {
+                        statusDiv.text(response).removeClass('alert-warning alert-danger').addClass('alert-success').fadeIn().delay(3000).fadeOut();
+                    },
+                    error: function(xhr) {
+                         var message = xhr.status === 401
+                            ? 'Для замовлення необхідно увійти в систему'
+                            : 'Виникла помилка додавання, повторіть спробу пізніше';
+                        var alertClass = xhr.status === 401 ? 'alert-warning' : 'alert-danger';
+                        statusDiv.text(message).removeClass('alert-success').addClass(alertClass).fadeIn().delay(3000).fadeOut();
+                    }
+                });
+            });
+        });
+    </script>
+}
