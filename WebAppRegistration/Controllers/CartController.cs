@@ -20,11 +20,58 @@ namespace WebAppRegistration.Controllers
             _context = context;
         }
 
+        public async Task<IActionResult> Index()
+        {
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var cartItems = await _context.CartItems
+                .Include(ci => ci.Product)
+                .Where(ci => ci.UserId == userId)
+                .ToListAsync();
+
+            return View(cartItems);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddToCart(int productId)
         {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdStr, out var userId))
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null || product.StockQuantity <= 0)
+            {
+                return StatusCode(500, "Товару немає в наявності.");
+            }
+
+            var cartItem = await _context.CartItems.FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == productId);
+
+            if (cartItem != null)
+            {
+                if (cartItem.Quantity + 1 > product.StockQuantity)
+                {
+                    return StatusCode(500, "Недостатньо товару на складі.");
+                }
+                cartItem.Quantity++;
+            }
+            else
+            {
+                _context.CartItems.Add(new CartItem { UserId = userId, ProductId = productId, Quantity = 1 });
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok("Товар успішно додано");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ModifyCartItem(int productId, int increment)
+        {
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
             {
                 return Unauthorized();
             }
@@ -32,29 +79,40 @@ namespace WebAppRegistration.Controllers
             try
             {
                 var cartItem = await _context.CartItems
+                    .Include(ci => ci.Product)
                     .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == productId);
 
-                if (cartItem != null)
+                if (cartItem == null)
                 {
-                    cartItem.Quantity++;
+                    return NotFound("Позицію не знайдено.");
+                }
+
+                int newQuantity = cartItem.Quantity + increment;
+
+                if (newQuantity < 0)
+                {
+                    return BadRequest("Кількість не може бути від'ємною.");
+                }
+
+                if (newQuantity == 0)
+                {
+                    _context.CartItems.Remove(cartItem);
                 }
                 else
                 {
-                    var newCartItem = new CartItem
+                    if (newQuantity > cartItem.Product.StockQuantity)
                     {
-                        UserId = userId,
-                        ProductId = productId,
-                        Quantity = 1
-                    };
-                    _context.CartItems.Add(newCartItem);
+                        return BadRequest("Недостатньо товару на складі.");
+                    }
+                    cartItem.Quantity = newQuantity;
                 }
 
                 await _context.SaveChangesAsync();
-                return Ok("Товар успішно додано");
+                return Ok();
             }
             catch (Exception)
             {
-                return StatusCode(500, "Виникла помилка додавання, повторіть спробу пізніше");
+                return StatusCode(500, "Сталась помилка, повторіть дію пізніше");
             }
         }
     }

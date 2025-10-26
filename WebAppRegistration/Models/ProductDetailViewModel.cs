@@ -6,5 +6,6 @@ namespace WebAppRegistration.Models
     {
         public Product Product { get; set; }
         public List<Product> RecommendedProducts { get; set; }
+        public bool IsInCart { get; set; }
     }
 }

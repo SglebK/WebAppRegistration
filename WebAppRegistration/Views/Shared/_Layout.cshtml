@@ -29,8 +29,8 @@
                         </li>
                     </ul>
 
-                    <div class="navbar-nav d-flex align-items-center">
-                        @if (User.Identity.IsAuthenticated)
+                    <ul class="navbar-nav d-flex align-items-center">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             var birthdayClaim = User.FindFirst(ClaimTypes.DateOfBirth)?.Value;
                             if (birthdayClaim != null && DateTime.TryParse(birthdayClaim, out var birthday))
@@ -42,27 +42,32 @@
                                     nextBirthday = nextBirthday.AddYears(1);
                                 }
                                 int daysUntilBirthday = (nextBirthday - today).Days;
-                                <span class="navbar-text me-3">
-                                    До вашого дня народження @daysUntilBirthday днів
-                                </span>
+                                <li class="nav-item">
+                                    <span class="navbar-text me-3">
+                                        До вашого дня народження @daysUntilBirthday днів
+                                    </span>
+                                </li>
                             }
 
-                            <!-- НОВІ ПОСИЛАННЯ -->
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Cart" asp-action="Index">Кошик</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Group" asp-action="Index">Групи</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Admin" asp-action="Index">Адмінка</a>
                             </li>
-                            <!-- /НОВІ ПОСИЛАННЯ -->
 
-                            <a asp-controller="Profile" asp-action="Index" class="user-avatar me-2 text-decoration-none" title="@User.Claims.FirstOrDefault(c => c.Type == "FullName")?.Value">
-                                @User.Identity.Name[0].ToString().ToUpper()
-                            </a>
+                            <li class="nav-item d-flex align-items-center">
+                                <a asp-controller="Profile" asp-action="Index" class="user-avatar me-2 text-decoration-none" title="@User.Claims.FirstOrDefault(c => c.Type == "FullName")?.Value">
+                                    @User.Identity.Name?[0].ToString().ToUpper()
+                                </a>
 
-                            <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
-                                <button type="submit" class="nav-link btn btn-link text-white">Вийти</button>
-                            </form>
+                                <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
+                                    <button type="submit" class="nav-link btn btn-link text-white">Вийти</button>
+                                </form>
+                            </li>
                         }
                         else
                         {
@@ -75,7 +80,7 @@
                                 </button>
                             </li>
                         }
-                    </div>
+                    </ul>
                 </div>
             </div>
         </nav>
@@ -86,7 +91,7 @@
         </main>
     </div>
 
-    @if (!User.Identity.IsAuthenticated)
+    @if (User.Identity == null || !User.Identity.IsAuthenticated)
     {
         <partial name="_LoginPartial" model="new WebAppRegistration.Models.LoginViewModel()" />
     }
@@ -100,7 +105,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    @if (!User.Identity.IsAuthenticated)
+    @if (User.Identity == null || !User.Identity.IsAuthenticated)
     {
         <script>
             $(function () {

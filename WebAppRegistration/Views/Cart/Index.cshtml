@@ -1,0 +1,99 @@
+﻿@model List<WebAppRegistration.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Ваш кошик";
+    decimal totalPrice = Model.Sum(item => item.Quantity * item.Product.Price);
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+
+@if (Model.Any())
+{
+    <div id="cart-container">
+        <table class="table text-white">
+            <thead>
+                <tr>
+                    <th>Товар</th>
+                    <th>Ціна</th>
+                    <th class="text-center">Кількість</th>
+                    <th class="text-end">Сума</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr data-product-id="@item.ProductId">
+                        <td>
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductId" class="text-white text-decoration-none">
+                                @item.Product.Name
+                            </a>
+                        </td>
+                        <td>@item.Product.Price.ToString("C")</td>
+                        <td class="text-center">
+                            <div class="input-group justify-content-center">
+                                <button class="btn btn-outline-secondary btn-sm change-quantity" data-increment="-1">-</button>
+                                <input type="text" class="form-control form-control-sm text-center bg-dark text-white" style="max-width: 60px;" value="@item.Quantity" readonly>
+                                <button class="btn btn-outline-secondary btn-sm change-quantity" data-increment="1">+</button>
+                            </div>
+                        </td>
+                        <td class="text-end subtotal">@((item.Quantity * item.Product.Price).ToString("C"))</td>
+                        <td class="text-center">
+                            <button class="btn btn-danger btn-sm remove-item">&times;</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h3 class="text-end mt-4">Загальна сума: <span id="totalPrice">@totalPrice.ToString("C")</span></h3>
+    </div>
+    <div id="cart-error" class="alert alert-danger mt-3" style="display:none;"></div>
+}
+else
+{
+    <p class="text-center fs-4 mt-5">Ваш кошик порожній.</p>
+}
+
+@section Scripts {
+    <script>
+        $(function() {
+            function modifyCart(productId, increment) {
+                $.ajax({
+                    url: '@Url.Action("ModifyCartItem", "Cart")',
+                    method: 'POST',
+                    data: { productId: productId, increment: increment },
+                    success: function() {
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        $('#cart-error').text(xhr.responseText).show();
+                    }
+                });
+            }
+
+            $('.change-quantity').on('click', function() {
+                var button = $(this);
+                var increment = parseInt(button.data('increment'));
+                var productId = button.closest('tr').data('product-id');
+                var currentQuantity = parseInt(button.siblings('input').val());
+
+                if (currentQuantity === 1 && increment === -1) {
+                    if (!confirm("Ви впевнені, що хочете видалити цей товар з кошику?")) {
+                        return;
+                    }
+                }
+                modifyCart(productId, increment);
+            });
+
+            $('.remove-item').on('click', function() {
+                if (confirm("Ви впевнені, що хочете видалити цей товар з кошику?")) {
+                    var button = $(this);
+                    var productId = button.closest('tr').data('product-id');
+                    var currentQuantity = parseInt(button.closest('tr').find('input').val());
+                    modifyCart(productId, -currentQuantity);
+                }
+            });
+        });
+    </script>
+}

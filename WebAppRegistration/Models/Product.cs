@@ -22,5 +22,8 @@ namespace WebAppRegistration.Models
 
         [ForeignKey("GroupId")]
         public Group? Group { get; set; }
+
+        [Range(0, int.MaxValue, ErrorMessage = "Кількість на складі не може бути від'ємною.")]
+        public int StockQuantity { get; set; } = 0;
     }
 }
