@@ -7,6 +7,20 @@
 
 <h1 class="text-center">@ViewData["Title"]</h1>
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-warning">@TempData["WarningMessage"]</div>
+}
+
+
 @if (Model.Any())
 {
     <div id="cart-container">
@@ -46,7 +60,15 @@
             </tbody>
         </table>
 
-        <h3 class="text-end mt-4">Загальна сума: <span id="totalPrice">@totalPrice.ToString("C")</span></h3>
+        <div class="d-flex justify-content-end align-items-center mt-4">
+            <div class="text-end me-4">
+                <h3>Загальна сума: <span id="totalPrice">@totalPrice.ToString("C")</span></h3>
+            </div>
+            <form asp-controller="Order" asp-action="Checkout" method="post">
+                <button type="submit" class="btn btn-success btn-lg">Оформити замовлення</button>
+            </form>
+        </div>
+
     </div>
     <div id="cart-error" class="alert alert-danger mt-3" style="display:none;"></div>
 }
