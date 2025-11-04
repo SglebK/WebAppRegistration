@@ -25,5 +25,6 @@ namespace WebAppRegistration.Models
 
         [Range(0, int.MaxValue, ErrorMessage = "Кількість на складі не може бути від'ємною.")]
         public int StockQuantity { get; set; } = 0;
+        public string? ImageUrl { get; set; }
     }
 }

@@ -22,6 +22,8 @@ namespace WebAppRegistration.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<User>().HasQueryFilter(u => u.DateDeleted == null);
             modelBuilder.Entity<CartItem>().HasQueryFilter(ci => ci.User.DateDeleted == null);
+            modelBuilder.Entity<Order>().HasQueryFilter(o => o.User.DateDeleted == null);
+            modelBuilder.Entity<OrderItem>().HasQueryFilter(oi => oi.Order.User.DateDeleted == null);
         }
     }
 }

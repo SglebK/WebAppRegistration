@@ -22,5 +22,9 @@ namespace WebAppRegistration.Models
         public Group? Parent { get; set; }
 
         public ICollection<Group>? Subgroups { get; set; }
+
+        public string? ImageUrl { get; set; }
+        public string? Slug { get; set; }
+        public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }
